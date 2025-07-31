@@ -14,11 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install GitHub CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gh
-
       - name: Get previous tag and changed files
         id: set
         run: |
@@ -33,22 +28,8 @@ jobs:
               fi
             done)
 
-          echo "Filtered releases-1:"
-          git tag --sort=-creatordate | grep '^release/v'
-
-          echo "Filtered releases-2:"
-          git tag --sort=-creatordate | grep '^release/v' | grep -v "^$CURRENT_TAG\$"
-
-          echo "Filtered releases-3:"
-          git tag --sort=-creatordate | grep '^release/v' | grep -v "^$CURRENT_TAG\$" | while read TAG; do
-              if [ "$(git log --format=%ct -1 "$TAG")" -lt "$(git log --format=%ct -1 "$CURRENT_TAG")" ]; then
-                echo "$TAG"
-                break
-              fi
-            done
-
-          echo "Previous tag: $PREV_TAG"
           echo "Current tag: $CURRENT_TAG"
+          echo "Previous tag: $PREV_TAG"
 
           if [ -z "$PREV_TAG" ]; then
             echo "No previous tag found, forcing full deploy."
