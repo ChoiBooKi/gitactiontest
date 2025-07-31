@@ -5,6 +5,18 @@ on:
     tags:
       - release/v*
 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "릴리즈 버전 (예: 1.2.3)"
+        required: true
+        type: string
+      force_full_deploy:
+        description: "전체 배포 강제 실행 (detect-changes 무시)"
+        required: false
+        default: false
+        type: boolean
+
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
