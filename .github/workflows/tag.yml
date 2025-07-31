@@ -19,6 +19,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh
 
+      - name: Debug - List releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh --version
+          echo "=== Release list ==="
+          echo "Current tag: $CURRENT_TAG"
+          echo "All releases:"
+          gh release list --limit 20 --json tagName --jq ".[] | .tagName"
+          echo "Filtered releases:"
+          gh release list --limit 20 --json tagName --jq ".[] | .tagName" | grep '^release/v'
+
       - name: Get previous tag and changed files
         id: set
         env:
