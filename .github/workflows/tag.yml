@@ -41,7 +41,7 @@ jobs:
               if ($0 == cur) found=1
               else if (found) { print $0; exit }
             }
-          ')
+          '
 
           PREV_TAG=$(gh release list --limit 20 --json tagName --jq ".[] | .tagName" \
             | grep '^release/v' \
