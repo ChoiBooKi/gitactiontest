@@ -25,29 +25,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           CURRENT_TAG="${GITHUB_REF_NAME#refs/tags/}"
-
-          echo gh --version
-          echo "=== Release list ==="
-          echo "Current tag: $CURRENT_TAG"
-          echo "All releases:"
-          gh release list --limit 20 --json tagName --jq ".[] | .tagName"
-          echo "Filtered releases:"
-          gh release list --limit 20 --json tagName --jq ".[] | .tagName" | grep '^release/v'
-          echo "Filtered releases-2:"
-          gh release list --limit 20 --json tagName --jq ".[] | .tagName" | grep '^release/v' | tac
-          echo "Filtered releases-3:"
-          gh release list --limit 20 --json tagName --jq ".[] | .tagName" | grep '^release/v' | tac | awk -v cur="$CURRENT_TAG" '
-            {
-              if ($0 == cur) found=1
-              else if (found) { print $0; exit }
-            }
-          '
-
-          PREV_TAG=$(gh release list --limit 20 --json tagName --jq ".[] | .tagName" \
-            | grep '^release/v' \
-            | grep -B1000 "^${CURRENT_TAG}$" \
-            | grep -v "^${CURRENT_TAG}$" \
-            | tail -n1)
+          PREV_TAG=$(gh release list --limit 20 --json tagName --jq ".[] | .tagName" | grep '^release/v' | sed -n 2p)
 
           echo "Previous tag: $PREV_TAG"
           echo "Current tag: $CURRENT_TAG"
