@@ -37,13 +37,7 @@ jobs:
           git tag --sort=-creatordate | grep '^release/v'
 
           echo "Filtered releases-2:"
-          git tag --sort=-creatordate | grep '^release/v' | grep -v "^$CURRENT_TAG\$" \
-          | while read TAG; do
-              if [ "$(git log --format=%ct -1 "$TAG")" -lt "$(git log --format=%ct -1 "$CURRENT_TAG")" ]; then
-                echo "$TAG"
-                break
-              fi
-            done
+          git tag --sort=-creatordate | grep '^release/v' | grep -v "^$CURRENT_TAG\$"
 
           echo "Filtered releases-3:"
           git tag --sort=-creatordate | grep '^release/v' | grep -v "^$CURRENT_TAG\$" | while read TAG; do
