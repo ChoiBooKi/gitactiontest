@@ -1,0 +1,51 @@
+name: Test Diff Previous Tag
+
+on:
+  push:
+    tags:
+      - release/v*
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: Get previous tag and changed files
+        id: set
+        run: |
+          CURRENT_TAG="${GITHUB_REF_NAME#refs/tags/}"
+
+          PREV_TAG=$(gh release list --limit 20 --json tagName --jq ".[] | .tagName" \
+            | grep '^release/v' \
+            | grep -B1000 "^${CURRENT_TAG}$" \
+            | grep -v "^${CURRENT_TAG}$" \
+            | tail -n1)
+
+          echo "Previous tag: $PREV_TAG"
+          echo "Current tag: $CURRENT_TAG"
+
+          if [ -z "$PREV_TAG" ]; then
+            echo "No previous tag found, forcing full deploy."
+            echo 'deploy=["all"]' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          FILES=$(git diff --name-only "$PREV_TAG" "$CURRENT_TAG")
+
+          if [ -z "$FILES" ]; then
+            echo "No files changed between $PREV_TAG and $CURRENT_TAG"
+            echo 'deploy=[]' >> "$GITHUB_OUTPUT"
+          else
+            echo "Changed files:"
+            echo "$FILES"
+            echo 'deploy=["some"]' >> "$GITHUB_OUTPUT"
+          fi
