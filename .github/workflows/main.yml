@@ -1,0 +1,19 @@
+name: Test Run Attempt
+
+on:
+  workflow_dispatch: # 수동 실행용
+
+jobs:
+  check-run-attempt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print context info
+        run: |
+          echo "🔍 github.event_name: ${{ github.event_name }}"
+          echo "🔁 github.run_attempt: ${{ github.run_attempt }}"
+
+          if [ "${{ github.run_attempt }}" -gt 1 ]; then
+            echo "✅ This is a re-run of the workflow."
+          else
+            echo "🚀 This is the first run of the workflow."
+          fi
